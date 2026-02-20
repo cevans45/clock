@@ -3,23 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pixel Clock</title>
+    <title>Pearls Sketch</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <canvas id="clockCanvas"></canvas>
-        <div class="controls">
-            <div class="control-group">
-                <label for="pixelSizeSlider">Pixel size: <span id="pixelSizeValue">4</span></label>
-                <input type="range" id="pixelSizeSlider" min="2" max="16" value="4" step="1">
-            </div>
-            <div class="control-group">
-                <label for="colorSlider">Color: <span id="colorValue">#000000</span></label>
-                <input type="range" id="colorSlider" min="0" max="360" value="0" step="1">
-            </div>
-        </div>
-        <div class="time-display" id="timeDisplay"></div>
+        <div id="sketch-container"></div>
     </div>
     <script src="script.js"></script>
 </body>
