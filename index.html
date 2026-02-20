@@ -13,7 +13,30 @@
         <aside class="control-panel">
             <header class="panel-header">
                 <h2>Controls</h2>
+                <button type="button" class="info-btn" id="info-btn" aria-label="What each control does">i</button>
             </header>
+            <div class="info-overlay" id="info-overlay" role="dialog" aria-label="Control descriptions" hidden>
+                <div class="info-content">
+                    <h3>What each control does</h3>
+                    <dl>
+                        <dt>Rows / Cols</dt>
+                        <dd>Grid size. More = smaller circles and tighter pattern; fewer = bigger circles.</dd>
+                        <dt>Fill density</dt>
+                        <dd>How much of the grid is filled (%). Higher = more connected blobs.</dd>
+                        <dt>Margin %</dt>
+                        <dd>Space around the grid. Higher = smaller drawing area, more border.</dd>
+                        <dt>Background</dt>
+                        <dd>Canvas background color. Does not change the composition.</dd>
+                        <dt>Dot 1–5</dt>
+                        <dd>Colors for each layer. Changing these only changes color; the pattern stays the same.</dd>
+                        <dt>Stroke weight</dt>
+                        <dd>Outline thickness on shapes. 0 = no outline.</dd>
+                        <dt>Random seed</dt>
+                        <dd>Number that determines the pattern. Same seed = same composition every time.</dd>
+                    </dl>
+                    <button type="button" class="info-close" id="info-close">Close</button>
+                </div>
+            </div>
             <div class="panel-body">
                 <section class="control-section">
                     <h3>Grid & size</h3>

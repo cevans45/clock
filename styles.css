@@ -58,6 +58,10 @@ body {
     padding: 14px 18px;
     border-bottom: 1px solid #3a3a3a;
     background: #252525;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
 }
 
 .panel-header h2 {
@@ -65,6 +69,107 @@ body {
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
+}
+
+.info-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid #555;
+    background: #333;
+    color: #aaa;
+    font-size: 12px;
+    font-weight: 700;
+    font-style: italic;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.info-btn:hover {
+    background: #444;
+    color: #e0e0e0;
+    border-color: #666;
+}
+
+.info-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 24px;
+}
+
+.info-overlay[hidden] {
+    display: none;
+}
+
+.info-content {
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 420px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+.info-content h3 {
+    font-size: 14px;
+    margin-bottom: 16px;
+    color: #e0e0e0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.info-content dl {
+    margin: 0 0 20px;
+}
+
+.info-content dt {
+    font-size: 12px;
+    font-weight: 700;
+    color: #bbb;
+    margin-top: 12px;
+}
+
+.info-content dt:first-child {
+    margin-top: 0;
+}
+
+.info-content dd {
+    font-size: 12px;
+    color: #888;
+    margin: 4px 0 0;
+    line-height: 1.45;
+}
+
+.info-close {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: #3a3a3a;
+    border: 1px solid #4a4a4a;
+    border-radius: 8px;
+    color: #e0e0e0;
+    cursor: pointer;
+}
+
+.info-close:hover {
+    background: #444;
 }
 
 .panel-body {

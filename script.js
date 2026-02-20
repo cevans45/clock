@@ -1,8 +1,8 @@
-/* Pearls design tool — controls drive the generative raster
- * https://www.fxhash.xyz/generative/slug/pearls
+/* Grid blobs design tool — connected nodes on a grid, inspired by pearl-style compositions
+ * Uses seeded randomness so composition stays fixed when only colors change.
  */
 
-let directions = [[1, 0], [0, 1], [-1,0], [0,-1], [1, 1], [-1, 1], [1, -1], [-1, -1]];
+let directions = [[1, 0], [0, 1], [-1, 0], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]];
 let raster = [];
 let rows = 5;
 let cols = 5;
@@ -10,7 +10,9 @@ let radius = 10;
 let margin = 5;
 let w;
 
-// Design tool params (synced from control panel)
+// Composition is generated once per draw using p5's seeded random; color changes don't regenerate it.
+let cachedRasters = [];
+
 let params = {
   rows: 5,
   cols: 5,
@@ -22,8 +24,6 @@ let params = {
   seed: 123456789
 };
 
-function fxrand() { return Math.random(); }
-
 function setup() {
   w = min(windowWidth - 320, windowHeight - 48);
   w = max(w, 300);
@@ -34,8 +34,25 @@ function setup() {
   angleMode(DEGREES);
 
   bindControls();
+  bindInfoButton();
   noLoop();
   redraw();
+}
+
+function bindInfoButton() {
+  const btn = document.getElementById('info-btn');
+  const overlay = document.getElementById('info-overlay');
+  const closeBtn = document.getElementById('info-close');
+  if (!btn || !overlay) return;
+  btn.addEventListener('click', () => {
+    overlay.hidden = false;
+  });
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => { overlay.hidden = true; });
+  }
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.hidden = true;
+  });
 }
 
 function bindControls() {
@@ -124,6 +141,11 @@ function draw() {
   radius = (width - 2 * margin) / cols / 2;
 
   randomSeed(int(params.seed));
+  cachedRasters = [];
+  const numLayers = params.colors.length;
+  for (let L = 0; L < numLayers; L++) {
+    cachedRasters.push(create_raster());
+  }
 
   background(params.bg);
   if (params.strokeWeight > 0) {
@@ -133,12 +155,10 @@ function draw() {
   }
 
   const palette = params.colors.map(hex => color(hex));
-
-  for (let c of palette) {
-    fill(c);
-    stroke(c);
-    raster = create_raster();
-    draw_raster(raster);
+  for (let i = 0; i < cachedRasters.length; i++) {
+    fill(palette[i]);
+    stroke(palette[i]);
+    draw_raster(cachedRasters[i]);
   }
 }
 
@@ -166,38 +186,18 @@ function draw_raster(raster) {
         if ((row + 1 < rows) && (col + 1 < cols)) {
           if (raster[row + 1][col + 1] == 1) {
             push();
-            translate(x, y);
-            beginShape();
-            vertex(0, radius);
-            for (let angle = -90; angle <= 0; angle += 1) {
-              vertex(radius * cos(angle), radius * (2 + sin(angle)));
-            }
-            vertex(radius, 2 * radius);
-            vertex(2 * radius, radius);
-            for (let angle = 90; angle <= 180; angle += 1) {
-              vertex(radius * (2 + cos(angle)), radius * (0 + sin(angle)));
-            }
-            vertex(radius, 0);
-            endShape();
+            translate(x + radius, y + radius);
+            rotate(45);
+            rect(0, 0, radius * 1.5, radius * 1.5, radius * 0.5);
             pop();
           }
         }
         if ((row + 1 < rows) && (col - 1 >= 0)) {
           if (raster[row + 1][col - 1] == 1) {
             push();
-            translate(x, y);
-            beginShape();
-            vertex(-radius, 0);
-            for (let angle = 0; angle <= 90; angle += 1) {
-              vertex(radius * (-2 + cos(angle)), radius * (0 + sin(angle)));
-            }
-            vertex(-2 * radius, radius);
-            vertex(-radius, 2 * radius);
-            for (let angle = 180; angle <= 270; angle += 1) {
-              vertex(radius * (0 + cos(angle)), radius * (2 + sin(angle)));
-            }
-            vertex(0, radius);
-            endShape();
+            translate(x - radius, y + radius);
+            rotate(-45);
+            rect(0, 0, radius * 1.5, radius * 1.5, radius * 0.5);
             pop();
           }
         }
@@ -207,23 +207,58 @@ function draw_raster(raster) {
 }
 
 function create_raster() {
-  var raster = new Array(rows);
-  for (var i = 0; i < raster.length; i++) {
-    raster[i] = new Array(cols);
+  var grid = new Array(rows);
+  for (var i = 0; i < grid.length; i++) {
+    grid[i] = new Array(cols);
   }
-
-  for (let row = 0; row < raster.length; row++) {
-    for (let col = 0; col < raster[row].length; col++) {
-      raster[row][col] = 0;
+  for (let row = 0; row < grid.length; row++) {
+    for (let col = 0; col < grid[row].length; col++) {
+      grid[row][col] = 0;
     }
   }
 
-  const numFilled = max(1, floor(rows * cols * params.density));
-  for (let i = 0; i < numFilled; i++) {
-    let r = Math.floor(fxrand() * rows);
-    let c = Math.floor(fxrand() * cols);
-    raster[r][c] = 1;
+  const total = rows * cols;
+  const numFilled = max(1, floor(total * params.density));
+  const numSeeds = max(1, floor(random(2, 6)));
+  const seeds = [];
+  for (let s = 0; s < numSeeds; s++) {
+    const r = floor(random(rows));
+    const c = floor(random(cols));
+    if (grid[r][c] === 0) {
+      grid[r][c] = 1;
+      seeds.push([r, c]);
+    }
   }
-
-  return raster;
+  let filled = seeds.length;
+  const stack = [...seeds];
+  while (filled < numFilled && stack.length > 0) {
+    const idx = floor(random(stack.length));
+    const [r, c] = stack[idx];
+    const neighbors = [];
+    for (const [dr, dc] of directions) {
+      const nr = r + dr;
+      const nc = c + dc;
+      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && grid[nr][nc] === 0) {
+        neighbors.push([nr, nc]);
+      }
+    }
+    if (neighbors.length === 0) {
+      stack.splice(idx, 1);
+      continue;
+    }
+    const pick = floor(random(neighbors.length));
+    const [nr, nc] = neighbors[pick];
+    grid[nr][nc] = 1;
+    stack.push([nr, nc]);
+    filled++;
+  }
+  while (filled < numFilled) {
+    const r = floor(random(rows));
+    const c = floor(random(cols));
+    if (grid[r][c] === 0) {
+      grid[r][c] = 1;
+      filled++;
+    }
+  }
+  return grid;
 }
