@@ -55,7 +55,7 @@ body {
     letter-spacing: 0.2em;
     text-transform: uppercase;
     margin-bottom: 12px;
-    animation: overtPop 900ms ease-out 1;
+    animation: ovrtPop 900ms ease-out 1;
 }
 
 .hero-copy {
@@ -459,7 +459,7 @@ body {
     cursor: default;
 }
 
-@keyframes overtPop {
+@keyframes ovrtPop {
     0% {
         transform: translateY(16px);
         letter-spacing: 0.4em;
