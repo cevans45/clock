@@ -34,39 +34,43 @@ body {
     flex-direction: column;
 }
 
-.site-header {
+.hero {
+    min-height: 80vh;
     display: flex;
-    justify-content: space-between;
-    gap: 24px;
-    padding: 18px 18px 8px;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 18px 8px;
     border-bottom: 1px solid #3a3a3a;
 }
 
-.site-header h1 {
-    font-size: 18px;
-    letter-spacing: 0.08em;
+.hero-inner {
+    max-width: 520px;
+}
+
+.hero-title {
+    font-size: 40px;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    margin-bottom: 6px;
+    margin-bottom: 10px;
 }
 
-.site-copy {
-    font-size: 12px;
+.hero-copy {
+    font-size: 13px;
     color: #b0b0b0;
-    line-height: 1.5;
-    max-width: 420px;
+    line-height: 1.6;
+    margin-bottom: 18px;
 }
 
-.site-link {
-    align-self: flex-start;
+.hero-link {
     font-size: 12px;
     color: #7c7cff;
     text-decoration: underline;
-    text-underline-offset: 2px;
+    text-underline-offset: 3px;
 }
 
 .site-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
     padding: 12px 18px 18px;
 }
@@ -389,5 +393,23 @@ body {
     .control-panel {
         width: 100%;
         max-width: 360px;
+    }
+}
+
+@media (max-width: 1100px) {
+    .site-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 840px) {
+    .site-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 540px) {
+    .site-grid {
+        grid-template-columns: 1fr;
     }
 }
