@@ -464,6 +464,23 @@ body.is-leaving {
     flex: 0 0 70px;
 }
 
+.panel-button {
+    padding: 4px 8px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-radius: 999px;
+    border: 1px solid #111;
+    background: #fff;
+    cursor: pointer;
+}
+
+.panel-button:hover {
+    background: #f0f0f0;
+}
+
 .control-row--disabled {
     opacity: 0.45;
 }

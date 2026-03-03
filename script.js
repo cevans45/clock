@@ -140,6 +140,7 @@ function bindControls() {
   const seedEl = document.getElementById('param-seed');
   const bgEl = document.getElementById('param-bg');
   const colorEls = ['param-color1','param-color2','param-color3','param-color4','param-color5'];
+  const randomColorsBtn = document.getElementById('btn-random-colors');
 
   if (rowsEl) {
     rowsEl.addEventListener('input', () => {
@@ -230,6 +231,13 @@ function bindControls() {
       });
     }
   });
+
+  if (randomColorsBtn) {
+    randomColorsBtn.addEventListener('click', () => {
+      randomizeColors();
+      redraw();
+    });
+  }
 
   updateRoundnessEnabled();
 }
