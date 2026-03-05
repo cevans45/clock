@@ -65,7 +65,6 @@ const sketch = (p) => {
     p.randomSeed(SEED);
 
     bindUIRedraw();
-    p.noLoop();
   };
 
   p.windowResized = () => {
@@ -84,12 +83,7 @@ const sketch = (p) => {
     p.rectMode(p.CENTER);
 
     const cell_w = min_width * 0.65 / 2;
-    for (let x = -1; x <= 1; ++x) {
-      for (let y = -1; y <= 1; ++y) {
-        pattern(p.width / 2 + cell_w * x, p.height / 2 + cell_w * y, cell_w * 0.5);
-      }
-    }
-    p.noLoop();
+    pattern(p.width / 2, p.height / 2, cell_w * 0.5);
   };
 
   function _draw(width, id, depth) {
