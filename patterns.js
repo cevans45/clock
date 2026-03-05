@@ -9,11 +9,15 @@ const sketch = (p) => {
   let PD;
 
   let SEED;
+  let LAYERS = 100;
+  let BLOCK = 20;
 
   function applyUI() {
     const depthEl = document.getElementById('pat-depth');
     const branchesEl = document.getElementById('pat-branches');
     const radiusEl = document.getElementById('pat-radius');
+    const layersEl = document.getElementById('pat-layers');
+    const blockEl = document.getElementById('pat-block');
     const paEl = document.getElementById('pat-pa');
     const pbEl = document.getElementById('pat-pb');
     const pcEl = document.getElementById('pat-pc');
@@ -34,6 +38,14 @@ const sketch = (p) => {
     if (depthEl) setVal('val-pat-depth', depthEl.value);
     if (branchesEl) setVal('val-pat-branches', branchesEl.value);
     if (radiusEl) setVal('val-pat-radius', (parseInt(radiusEl.value, 10) / 100).toFixed(2));
+    if (layersEl) {
+      LAYERS = parseInt(layersEl.value, 10);
+      setVal('val-pat-layers', layersEl.value);
+    }
+    if (blockEl) {
+      BLOCK = parseInt(blockEl.value, 10);
+      setVal('val-pat-block', blockEl.value);
+    }
     if (paEl) setVal('val-pat-pa', PA.toFixed(2));
     if (pbEl) setVal('val-pat-pb', PB.toFixed(2));
     if (pcEl) setVal('val-pat-pc', String(PC));
@@ -83,6 +95,7 @@ const sketch = (p) => {
     p.rectMode(p.CENTER);
 
     const cell_w = min_width * 0.65 / 2;
+    // Single composition in the center
     pattern(p.width / 2, p.height / 2, cell_w * 0.5);
   };
 
