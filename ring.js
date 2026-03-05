@@ -1,7 +1,7 @@
 // Shape orbits tool — animated shapes with mirroring and modes
 
 let orbitParams = {
-  count: 24,
+  count: 3,
   speed: 60,       // pixels per second equivalent
   mode: 'orbit',   // horizontal | vertical | diagonal | orbit | mixed
   shape: 'circle', // circle | square | triangle | mixed
@@ -19,15 +19,13 @@ let orbitCanvasWidth;
 
 function createOrbitShapes() {
   orbitShapes = [];
-  const cols = Math.ceil(Math.sqrt(orbitParams.count));
-  const rows = Math.ceil(orbitParams.count / cols);
+  const n = constrain(orbitParams.count, 1, 5);
+  const baseRadius = min(width, height) * 0.12;
   for (let i = 0; i < orbitParams.count; i++) {
-    const c = i % cols;
-    const r = Math.floor(i / cols);
-    const x = map(c + 0.5, 0, cols, 0, width);
-    const y = map(r + 0.5, 0, rows, 0, height);
+    const x = width / 2;
+    const y = height / 2;
     const angle = random(TWO_PI);
-    const radius = min(width, height) * 0.25 + random(-30, 30);
+    const radius = baseRadius + i * (orbitParams.size * 2.4);
     const dir = random([-1, 1]);
     const vx = random([-1, 1]);
     const vy = random([-1, 1]);
@@ -43,6 +41,8 @@ function createOrbitShapes() {
       speedFactor: 1,
       modeOverride: null,
       kindOverride: null,
+      filled: true,
+      strokeW: 0,
     });
   }
   orbitSelected = orbitShapes.length ? 0 : -1;
@@ -98,6 +98,8 @@ function bindOrbitControls() {
   const selSpeedEl = document.getElementById('orbit-selected-speed');
   const selModeEl = document.getElementById('orbit-selected-mode');
   const selLabel = document.getElementById('label-selected-index');
+  const selFillEl = document.getElementById('orbit-selected-fill');
+  const selStrokeEl = document.getElementById('orbit-selected-stroke');
 
   if (countEl) {
     countEl.addEventListener('input', () => {
@@ -201,6 +203,14 @@ function bindOrbitControls() {
     if (selModeEl) {
       selModeEl.value = s.modeOverride || 'inherit';
     }
+    if (selFillEl) {
+      selFillEl.checked = s.filled !== false;
+    }
+    if (selStrokeEl) {
+      selStrokeEl.value = s.strokeW || 0;
+      const out = document.getElementById('value-orbit-selected-stroke');
+      if (out) out.textContent = selStrokeEl.value;
+    }
   };
 
   if (selSizeEl) {
@@ -231,6 +241,24 @@ function bindOrbitControls() {
       if (!s) return;
       const v = selModeEl.value;
       s.modeOverride = v === 'inherit' ? null : v;
+    });
+  }
+
+  if (selFillEl) {
+    selFillEl.addEventListener('change', () => {
+      const s = orbitShapes[orbitSelected];
+      if (!s) return;
+      s.filled = selFillEl.checked;
+    });
+  }
+
+  if (selStrokeEl) {
+    selStrokeEl.addEventListener('input', () => {
+      const s = orbitShapes[orbitSelected];
+      if (!s) return;
+      s.strokeW = parseInt(selStrokeEl.value, 10) || 0;
+      const out = document.getElementById('value-orbit-selected-stroke');
+      if (out) out.textContent = selStrokeEl.value;
     });
   }
 
@@ -267,6 +295,38 @@ function mousePressed() {
     if (selLabel) {
       selLabel.textContent = `Shape #${orbitSelected + 1}`;
     }
+    // Sync selected controls with this shape
+    const s = orbitShapes[orbitSelected];
+    if (s) {
+      const selSizeEl = document.getElementById('orbit-selected-size');
+      const selSpeedEl = document.getElementById('orbit-selected-speed');
+      const selModeEl = document.getElementById('orbit-selected-mode');
+      const selFillEl = document.getElementById('orbit-selected-fill');
+      const selStrokeEl = document.getElementById('orbit-selected-stroke');
+      if (selSizeEl) {
+        const v = Math.round(orbitParams.size * (s.sizeFactor || 1));
+        selSizeEl.value = v;
+        const out = document.getElementById('value-orbit-selected-size');
+        if (out) out.textContent = selSizeEl.value;
+      }
+      if (selSpeedEl) {
+        const v = (s.speedFactor || 1);
+        selSpeedEl.value = Math.round(v * 100);
+        const out = document.getElementById('value-orbit-selected-speed');
+        if (out) out.textContent = v.toFixed(2) + 'x';
+      }
+      if (selModeEl) {
+        selModeEl.value = s.modeOverride || 'inherit';
+      }
+      if (selFillEl) {
+        selFillEl.checked = s.filled !== false;
+      }
+      if (selStrokeEl) {
+        selStrokeEl.value = s.strokeW || 0;
+        const out = document.getElementById('value-orbit-selected-stroke');
+        if (out) out.textContent = selStrokeEl.value;
+      }
+    }
   }
 }
 
@@ -275,11 +335,20 @@ function draw() {
   const t = millis() / 1000;
   const baseSpeed = orbitParams.speed / 200;
 
+  // Draw artboard stroke
+  push();
+  noFill();
+  stroke('#111');
+  strokeWeight(1);
+  rectMode(CORNER);
+  rect(0.5, 0.5, width - 1, height - 1);
+  pop();
+
   for (let i = 0; i < orbitShapes.length; i++) {
     const s = orbitShapes[i];
     updateShapePosition(s, t, baseSpeed, i);
     const isSelected = i === orbitSelected;
-    drawMirroredShape(s.x, s.y, isSelected);
+    drawMirroredShape(s.x, s.y, isSelected, s);
   }
 }
 
@@ -325,7 +394,7 @@ function updateShapePosition(s, t, baseSpeed, idx) {
   }
 }
 
-function drawMirroredShape(x, y, isSelected) {
+function drawMirroredShape(x, y, isSelected, shapeObj) {
   const m = orbitParams.mirror || 1;
   const positions = [{ x, y }];
   if (m >= 2) positions.push({ x: width - x, y });
@@ -342,7 +411,7 @@ function drawMirroredShape(x, y, isSelected) {
       rect(p.x, p.y, orbitParams.size + pad, orbitParams.size + pad);
       noStroke();
     }
-    drawOrbitShape(p.x, p.y);
+    drawOrbitShape(p.x, p.y, shapeObj);
   });
 }
 
@@ -352,12 +421,32 @@ function pickShapeForIndex() {
   return random(options);
 }
 
-function drawOrbitShape(x, y) {
-  const sz = orbitParams.size;
-  const s = pickShapeForIndex();
-  if (s === 'square') {
+function drawOrbitShape(x, y, shapeObj) {
+  const baseSize = orbitParams.size;
+  const kind = pickShapeForIndex();
+
+  const sizeFactor = shapeObj && shapeObj.sizeFactor ? shapeObj.sizeFactor : 1;
+  const strokeW = shapeObj && typeof shapeObj.strokeW === 'number' ? shapeObj.strokeW : 0;
+  const filled = !shapeObj || shapeObj.filled !== false;
+  const sz = baseSize * sizeFactor;
+
+  if (strokeW > 0) {
+    stroke(orbitParams.color);
+    strokeWeight(strokeW);
+  } else {
+    noStroke();
+  }
+
+  if (filled) {
+    fill(orbitParams.color);
+  } else {
+    noFill();
+  }
+
+  if (kind === 'square') {
+    rectMode(CENTER);
     rect(x, y, sz, sz);
-  } else if (s === 'triangle') {
+  } else if (kind === 'triangle') {
     const h = sz * 1.15;
     triangle(
       x,

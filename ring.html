@@ -24,8 +24,8 @@
                         <h3>Layout</h3>
                         <div class="control-row">
                             <label for="orbit-count">Shapes</label>
-                            <input type="range" id="orbit-count" min="1" max="80" value="24" step="1">
-                            <span class="param-value" id="value-orbit-count">24</span>
+                            <input type="range" id="orbit-count" min="1" max="5" value="3" step="1">
+                            <span class="param-value" id="value-orbit-count">3</span>
                         </div>
                         <div class="control-row">
                             <label for="orbit-scale">Canvas scale</label>
@@ -98,9 +98,18 @@
                             <label id="label-selected-index">Shape #1</label>
                         </div>
                         <div class="control-row">
+                            <label for="orbit-selected-fill">Fill</label>
+                            <input type="checkbox" id="orbit-selected-fill" checked>
+                        </div>
+                        <div class="control-row">
                             <label for="orbit-selected-size">Size</label>
                             <input type="range" id="orbit-selected-size" min="4" max="80" value="20" step="2">
                             <span class="param-value" id="value-orbit-selected-size">20</span>
+                        </div>
+                        <div class="control-row">
+                            <label for="orbit-selected-stroke">Stroke</label>
+                            <input type="range" id="orbit-selected-stroke" min="0" max="8" value="0" step="1">
+                            <span class="param-value" id="value-orbit-selected-stroke">0</span>
                         </div>
                         <div class="control-row">
                             <label for="orbit-selected-speed">Speed</label>
