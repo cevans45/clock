@@ -112,25 +112,27 @@ function crtDrawBlock(p, x, y, w, h) {
 function rectSymmetric(p, w, h, xx, yy, sx, sy, vw, vh) {
   const m = crtParams.mirrors || 1;
 
-  // base orientation
-  if (m >= 1) {
-    crtDrawBlock(p, -w / 2 + w / 2 + (-w / 2 + xx) * sx, -h / 2 + h / 2 + (-h / 2 + yy) * sy, vw, vh);
-  }
-  if (m >= 2) {
-    crtDrawBlock(p, -w / 2 + w - (w / 2 + (-w / 2 + xx) * sx), -h / 2 + h / 2 + (-h / 2 + yy) * sy, vw, vh);
-  }
-  if (m >= 3) {
-    crtDrawBlock(p, -w / 2 + w / 2 + (-w / 2 + xx) * sx, -h / 2 + h - (h / 2 + (-h / 2 + yy) * sy), vw, vh);
-  }
-  if (m >= 4) {
-    crtDrawBlock(p, -w / 2 + w - (w / 2 + (-w / 2 + xx) * sx), -h / 2 + h - (h / 2 + (-h / 2 + yy) * sy), vw, vh);
+  // base position in top-left quadrant
+  const baseX = -w / 2 + w / 2 + (-w / 2 + xx) * sx;
+  const baseY = -h / 2 + h / 2 + (-h / 2 + yy) * sy;
 
-    // swapped orientation for extra complexity
-    crtDrawBlock(p, -h / 2 + h / 2 + (-h / 2 + yy) * sy, -w / 2 + w / 2 + (-w / 2 + xx) * sx, vw, vh);
-    crtDrawBlock(p, -h / 2 + h / 2 + (-h / 2 + yy) * sy, -w / 2 + w - (w / 2 + (-w / 2 + xx) * sx), vw, vh);
-    crtDrawBlock(p, -h / 2 + h - (h / 2 + (-h / 2 + yy) * sy), -w / 2 + w / 2 + (-w / 2 + xx) * sx, vw, vh);
-    crtDrawBlock(p, -h / 2 + h - (h / 2 + (-h / 2 + yy) * sy), -w / 2 + w - (w / 2 + (-w / 2 + xx) * sx), vw, vh);
-  }
+  const positions = [];
+
+  // 1: base
+  if (m >= 1) positions.push({ x: baseX, y: baseY });
+  // 2: horizontal mirror
+  if (m >= 2) positions.push({ x: w - baseX - vw, y: baseY });
+  // 3: vertical mirror
+  if (m >= 3) positions.push({ x: baseX, y: h - baseY - vh });
+  // 4: both axes
+  if (m >= 4) positions.push({ x: w - baseX - vw, y: h - baseY - vh });
+  // 5–6: diagonals (swap x/y around center)
+  const diagX = baseY;
+  const diagY = baseX;
+  if (m >= 5) positions.push({ x: diagX, y: diagY });
+  if (m >= 6) positions.push({ x: w - diagX - vw, y: h - diagY - vh });
+
+  positions.forEach(pos => crtDrawBlock(p, pos.x, pos.y, vw, vh));
 }
 
 function bindCrtControls() {
